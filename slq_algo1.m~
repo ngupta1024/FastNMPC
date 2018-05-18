@@ -2,8 +2,6 @@ function slq_algo1
 %% writing a good code
 % all functions, structs and classes- Camel case
 % all variables-underscore
-oldpath=path;
-path(oldpath,'/home/Naman/Downloads/myAutomaticDifferentiation')
 
 %% main
 modelParams=setParams();
@@ -16,7 +14,7 @@ trajectory.u=trajectory.u';
 while max_iter<10000
     %simulate the trajectory
     for time_iter=1:modelParams.dt:modelParams.T
-        A(time_iter)=
+        
     end
     if norm(l)<10e-5
         break
@@ -60,7 +58,4 @@ end
         J= error_goal'*modelParams.Qf*error_goal + recurr_cost;
     end
    
-    %% linearization of system dynamics at trajectory points
-    function A,B=linDynamics(modelParams,trajectory)
-    end
 end
