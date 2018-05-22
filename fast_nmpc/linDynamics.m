@@ -1,0 +1,23 @@
+%% linearization of system dynamics at trajectory points
+    %returns A 2x2xN B 2xN
+function [A,B]=linDynamics(modelParams,trajectory)
+delta=0.01;
+% calculate A
+for traj_iter=1:1:(modelParams.T/modelParams.dt)
+    [f_x1_plus,~]=simplePendDynamics(trajectory.x(:,traj_iter)+[delta;0],...
+        trajectory.u(:,traj_iter),modelParams);
+    [f_x1_min,~]= simplePendDynamics(trajectory.x(:,traj_iter)-[delta;0],...
+        trajectory.u(:,traj_iter), modelParams);
+    [f_x2_plus,~]=simplePendDynamics(trajectory.x(:,traj_iter)+[0;delta],...
+        trajectory.u(:,traj_iter),modelParams);
+    [f_x2_min,~]= simplePendDynamics(trajectory.x(:,traj_iter)-[0;delta],...
+        trajectory.u(:,traj_iter), modelParams);
+    [f_u_plus,~]=simplePendDynamics(trajectory.x(:,traj_iter),...
+        trajectory.u(:,traj_iter)+delta,modelParams);
+    [f_u_min,~]= simplePendDynamics(trajectory.x(:,traj_iter),...
+        trajectory.u(:,traj_iter)-delta, modelParams);
+    B(:,traj_iter)=(f_u_plus-f_u_min)/(2*delta);
+    A(:,:,traj_iter)=[(f_x1_plus-f_x1_min)/(2*delta) ...
+        (f_x2_plus-f_x2_min)/(2*delta)];
+end
+end
