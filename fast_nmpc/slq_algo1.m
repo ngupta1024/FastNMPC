@@ -63,8 +63,6 @@ while max_iter<10000
     r_t=2*bsxfun(@times, diag(modelParams.Rt), u_diff);
     
     %initialize ricatti variables
-%     G=zeros(modelParams.N,2);
-%     g=zeros(modelParams.N);
     K=zeros(modelParams.N,2);
     l=zeros(modelParams.N,1);
     
