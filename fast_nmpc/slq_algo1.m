@@ -23,13 +23,14 @@ else
     load('desired.mat','des_traj');
 end
 if modelParams.viz
+    figure(1);
     set(0,'DefaultFigureWindowStyle','docked')
     plot([1:1:modelParams.N],nom_traj.u)
     hold on;
     plot([1:1:modelParams.N],des_traj.u)
     legend('nominal','desired');
     hold off;
-    figure;
+    figure(2);
     plot(nom_traj.x(1,:),nom_traj.x(2,:))
     hold on;
     plot(des_traj.x(1,:),des_traj.x(2,:))
@@ -39,7 +40,7 @@ if modelParams.viz
 end
 %% loop
 %repeat until max number of iterations or converged (l(t)<l_t)
-max_iter=9999;
+max_iter=1;
 while max_iter<10000
     %simulate the trajectory
     nom_traj.x(:,1)=modelParams.x_init;
@@ -50,6 +51,9 @@ while max_iter<10000
     
     % linearize the dynamics
     [A,B]=linDynamics(modelParams,nom_traj);
+    
+    %compute cost function
+    J_nom=computeActualCost(nom_traj,des_traj,modelParams);
     
     % Quadratize cost function along the trajectory
     p1=zeros(2,2,modelParams.N);
@@ -93,33 +97,40 @@ while max_iter<10000
     %%Line Search
     alpha=1;
     for ls_iter=1:modelParams.ls_steps
-        x(:,1)=modelParams.x_init;
+        act_traj.x(:,1)=modelParams.x_init;
         for sim_iter=1:modelParams.N-1
-            u(sim_iter)= nom_traj.u(sim_iter)+alpha*l(sim_iter)+...
-                K(sim_iter,:)*(x(:,sim_iter)-nom_traj.x(:,sim_iter));
-            if abs(u(sim_iter))>modelParams.u_lim
-                u(sim_iter)=sign(u(sim_iter))*modelParams.u_lim;
+            act_traj.u(sim_iter)= nom_traj.u(sim_iter)+alpha*l(sim_iter)+...
+                K(sim_iter,:)*(act_traj.x(:,sim_iter)-nom_traj.x(:,sim_iter));
+            if abs(act_traj.u(sim_iter))>modelParams.u_lim
+                act_traj.u(sim_iter)=sign(act_traj.u(sim_iter))*modelParams.u_lim;
             end
-            [~,x(:,sim_iter+1)]=simplePendDynamics(x(:,sim_iter),...
-                u(sim_iter),modelParams);
+            [~,act_traj.x(:,sim_iter+1)]=simplePendDynamics(act_traj.x(:,sim_iter),...
+                act_traj.u(sim_iter),modelParams);
         end
-        J=computeActualCost(x,u);
+        act_traj.u(modelParams.N)=0;
+        J_actual=computeActualCost(act_traj,des_traj,modelParams);
+        if J_actual<J_nom
+            break
+        end
+        alpha=alpha/modelParams.alpha_d;
     end
     if modelParams.viz
-        figure;
+        figure(3);
         set(0,'DefaultFigureWindowStyle','docked')
-        plot([1:1:modelParams.N],[u 0])
+        plot([1:1:modelParams.N],act_traj.u)
         hold on;
         plot([1:1:modelParams.N],nom_traj.u)
         legend('actual','nominal');
         hold off;
-        figure;
+        figure(4);
         plot(nom_traj.x(1,:),nom_traj.x(2,:))
         hold on;
-        plot(x(1,:),x(2,:))
+        plot(act_traj.x(1,:),act_traj.x(2,:))
         legend('nominal','actual');
         hold off;
-    end   
+    end
+    nom_traj.u=act_traj.u;
+    norm(l)
     max_iter=max_iter+1;
 end    
     
