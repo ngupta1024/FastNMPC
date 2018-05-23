@@ -103,8 +103,6 @@ while max_iter<10000
             [~,x(:,sim_iter+1)]=simplePendDynamics(x(:,sim_iter),...
                 u(sim_iter),modelParams);
         end
-        J=computeActualCost(x,u);
-    end
     if modelParams.viz
         figure;
         set(0,'DefaultFigureWindowStyle','docked')
@@ -120,6 +118,7 @@ while max_iter<10000
         legend('nominal','actual');
         hold off;
     end   
+    end
     max_iter=max_iter+1;
 end    
     

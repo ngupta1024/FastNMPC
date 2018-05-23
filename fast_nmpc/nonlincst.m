@@ -5,5 +5,5 @@ function [c,ceq]=nonlincst(nom_traj,dynamics,x_goal,modelParams)
     BoundaryInit=modelParams.x_init-xNext(:,1);
     delta=hermiteSimpsonDefects(xNext,u,dynamics,modelParams);
     c = [];  %No inequality constraints
-    ceq = [BoundaryInit; reshape(delta,2*modelParams.N-2,1); BoundaryFinal];
+    ceq = [BoundaryInit; reshape(delta,2*modelParams.N-2,1); BoundaryFinal; u(end)];
 end

@@ -1,0 +1,3 @@
+function J=computeActualCost(actual_traj. desired_traj)
+    x_dif
+end

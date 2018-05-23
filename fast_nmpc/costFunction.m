@@ -1,3 +1,6 @@
+%% params nomTraj=[u;x] %3xN
+%% params modelParams 
+%% return J scalar cost function
 function J=costFunction(nomTraj, modelParams)
 %%only instantaneous term
 J=0;
