@@ -6,7 +6,7 @@ close all
 
 %% main
 modelParams=setParams();
-
+last_l=0;
 %% handles for dynamics
 simple_pend=@(x,u)simplePendDynamics(x,u, modelParams);
 aug_pend=@(x,u)augPendDynamics(x,u, modelParams);
@@ -36,7 +36,7 @@ if modelParams.viz
     plot(des_traj.x(1,:),des_traj.x(2,:))
     legend('nominal','desired');
     hold off;
-    
+    drawnow
 end
 %% loop
 %repeat until max number of iterations or converged (l(t)<l_t)
@@ -128,9 +128,13 @@ while max_iter<10000
         plot(act_traj.x(1,:),act_traj.x(2,:))
         legend('nominal','actual');
         hold off;
+        drawnow
     end
     nom_traj.u=act_traj.u;
-    norm(l)
+    if abs(last_l-norm(l))<1e-5
+        break
+    end
+    last_l=norm(l)
     max_iter=max_iter+1;
 end    
     

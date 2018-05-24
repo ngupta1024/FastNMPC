@@ -5,5 +5,5 @@ function J=computeActualCost(actual_traj,desired_traj,modelParams)
     for inst_iter=1:modelParams.N-1
         J=J+x_diff(:,inst_iter)'*modelParams.Qt*x_diff(:, inst_iter)...
             +u_diff(inst_iter)'*modelParams.Rt*u_diff(inst_iter);
-    end
+    end    
 end

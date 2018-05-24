@@ -1,4 +1,6 @@
 function modelParams=setParams()
+%% algo 1
+
     modelParams.g=1;%9.8
     modelParams.length=1;
     modelParams.dt=0.1;
@@ -13,4 +15,9 @@ function modelParams=setParams()
     modelParams.viz=1;
     modelParams.ls_steps=100;
     modelParams.alpha_d=1.3;
+    
+%% algo 2
+
+    modelParams.policy_lag=10;
+    
 end
