@@ -29,12 +29,14 @@ if modelParams.viz
     hold on;
     plot([1:1:modelParams.N],des_traj.u)
     legend('nominal','desired');
+    title('control versus time - given')
     hold off;
     figure(2);
     plot(nom_traj.x(1,:),nom_traj.x(2,:))
     hold on;
     plot(des_traj.x(1,:),des_traj.x(2,:))
     legend('nominal','desired');
+    title('state space - given')
     hold off;
     drawnow
 end
@@ -57,7 +59,7 @@ while max_iter<10000
     
     % Quadratize cost function along the trajectory
     p1=zeros(2,2,modelParams.N);
-    p1(:,:,modelParams.N)=modelParams.Qf;
+    p1(:,:,modelParams.N)=2*modelParams.Qf;
     p2=zeros(2,modelParams.N);
     p2(:,modelParams.N)=2*modelParams.Qf*(nom_traj.x(:,end)-des_traj.x(:,end));
     x_diff=nom_traj.x-des_traj.x;
@@ -89,9 +91,9 @@ while max_iter<10000
         %p2-2x1
         p2(:,ricatti_iter)=q_t(:,ricatti_iter)+...
             A(:,:,ricatti_iter)'*p2(:,ricatti_iter+1)...
-            + K(ricatti_iter,:)'*H*l(ricatti_iter)+...
+            + 2*K(ricatti_iter,:)'*H*l(ricatti_iter)+...
             K(ricatti_iter,:)'*g+...
-            G'*l(ricatti_iter);
+            2*G'*l(ricatti_iter);
     end
     
     %%Line Search
@@ -116,17 +118,20 @@ while max_iter<10000
     end
     if modelParams.viz
         figure(3);
-        set(0,'DefaultFigureWindowStyle','docked')
-        plot([1:1:modelParams.N],act_traj.u)
         hold on;
-        plot([1:1:modelParams.N],nom_traj.u)
-        legend('actual','nominal');
+        set(0,'DefaultFigureWindowStyle','docked')
+        plot([1:1:modelParams.N],act_traj.u,'DisplayName','actual_'+string(max_iter))
+%         hold on;
+%         plot([1:1:modelParams.N],nom_traj.u)
+        legend('show');
+        title('Control Input versus time - actual')
         hold off;
         figure(4);
-        plot(nom_traj.x(1,:),nom_traj.x(2,:))
+%         plot(nom_traj.x(1,:),nom_traj.x(2,:))
         hold on;
-        plot(act_traj.x(1,:),act_traj.x(2,:))
-        legend('nominal','actual');
+        plot(act_traj.x(1,:),act_traj.x(2,:),'DisplayName','actual_'+string(max_iter))
+        legend('show');
+        title('state space - actual')
         hold off;
         drawnow
     end
