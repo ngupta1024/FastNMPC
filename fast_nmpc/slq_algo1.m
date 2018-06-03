@@ -121,13 +121,10 @@ while max_iter<10000
         hold on;
         set(0,'DefaultFigureWindowStyle','docked')
         plot([1:1:modelParams.N],act_traj.u,'DisplayName','actual_'+string(max_iter))
-%         hold on;
-%         plot([1:1:modelParams.N],nom_traj.u)
         legend('show');
         title('Control Input versus time - actual')
         hold off;
         figure(4);
-%         plot(nom_traj.x(1,:),nom_traj.x(2,:))
         hold on;
         plot(act_traj.x(1,:),act_traj.x(2,:),'DisplayName','actual_'+string(max_iter))
         legend('show');
@@ -142,5 +139,10 @@ while max_iter<10000
     last_l=norm(l)
     max_iter=max_iter+1;
 end    
-    
+figure(2);
+hold on;
+set(0,'DefaultFigureWindowStyle','docked')
+plot(act_traj.x(1,:),act_traj.x(2,:),'DisplayName','Actual')
+legend('show');
+hold off;
 end
