@@ -21,11 +21,9 @@ for traj_iter=1:1:(modelParams.T/modelParams.dt)
         (f_x2_plus-f_x2_min)/(2*delta)];
     
     %% Discretization- hack from wikipedia
-    M=[A(:,:,traj_iter) B(:,traj_iter);...
-        zeros(size(B(:,traj_iter),2),size(A,1)+size(B(:,traj_iter),2))]*modelParams.dt;
+    M=[A(:,:,traj_iter) B(:,traj_iter);zeros(size(B,1),size(A,1))]*modelParams.dt;
     M=expm(M);
-    A(:,:,traj_iter)=M(1:size(A,1),1:size(A,2));
-    B(:,traj_iter)=M(1:size(A,1),end);
+    A(:,:,traj_iter)=M(1:
     
 end
 end

@@ -43,7 +43,7 @@ end
 %% loop
 %repeat until max number of iterations or converged (l(t)<l_t)
 max_iter=1;
-while max_iter<10000
+while max_iter<20
     %simulate the trajectory
     nom_traj.x(:,1)=modelParams.x_init;
     for time_iter=1:modelParams.N-1
