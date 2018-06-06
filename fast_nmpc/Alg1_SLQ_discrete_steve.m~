@@ -52,7 +52,7 @@ Qf = 2000*Q ;
 R = 1*eye(Nu) ;
 
 save LOAD_given.mat
-
+{
 
 global xf N dt
 T = 10 ;% [sec] total time 
@@ -112,14 +112,15 @@ N = floor(T/dt)+1 ;% number of collocation points
 t = 0:dt:T ;%
 
 save('LOAD_collocation.mat')
-
-% load LOAD_collocation.mat
-% load LOAD_given.mat
+%}
+load LOAD_collocation.mat
+load LOAD_given.mat
 
 xd = interp1(t_',X{1}',t)' ;% interpolate states
 ud = interp1(t_',U{1}',t) ;% interpolate control
 xnom = interp1(t_',X{2}',t)' ;% interpolate states
 unom = interp1(t_',U{2}',t) ;% interpolate control
+
 %% START FIRST WHILE LOOP
 global Wp pp
 
@@ -166,7 +167,7 @@ if PLOTTING == 1
     PLOTTER(1,[t;xnom;unom;xd;ud]);
 end
 
-%% loop
+%%
 l_iter = 1 ;
 tic
 timer = cputime ;

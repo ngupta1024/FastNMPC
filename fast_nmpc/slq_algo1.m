@@ -44,7 +44,7 @@ end
 %repeat until max number of iterations or converged (l(t)<l_t)
 max_iter=1;
 while max_iter<20
-    %simulate the trajectory
+    %simulate the trajectory forward
     nom_traj.x(:,1)=modelParams.x_init;
     for time_iter=1:modelParams.N-1
         [~, nom_traj.x(:,time_iter+1)]=simplePendDynamics(nom_traj.x(:,time_iter),...
@@ -56,17 +56,18 @@ while max_iter<20
     
     %compute cost function
     J_nom=computeActualCost(nom_traj,des_traj,modelParams);
-    
+    fprintf('At Iteration %d, cost= %f \n',max_iter,J_nom);
     % Quadratize cost function along the trajectory
-    p1=zeros(2,2,modelParams.N);
+    p1=zeros(2,2,modelParams.N);% corresponds to P in the psuedocode
     p1(:,:,modelParams.N)=2*modelParams.Qf;
-    p2=zeros(2,modelParams.N);
+    p2=zeros(2,modelParams.N);% corresponds to bold p in the psuedocode
     p2(:,modelParams.N)=2*modelParams.Qf*(nom_traj.x(:,end)-des_traj.x(:,end));
     x_diff=nom_traj.x-des_traj.x;
     u_diff=nom_traj.u-des_traj.u;
     q_t=2*bsxfun(@times, diag(modelParams.Qt), x_diff);
     r_t=2*bsxfun(@times, diag(modelParams.Rt), u_diff);
-    
+    Q=2*modelParams.Qt;
+    R=2*modelParams.Rt;
     %initialize ricatti variables
     K=zeros(modelParams.N-1,2);
     l=zeros(modelParams.N-1,1);
@@ -74,7 +75,7 @@ while max_iter<20
     %Backwards solve the Ricatti-like equations
     for ricatti_iter=modelParams.N-1:-1:1
         %H-scalar
-        H=modelParams.Rt+B(:,ricatti_iter)'*p1(:,:,ricatti_iter+1)*B(:,ricatti_iter);
+        H=R+B(:,ricatti_iter)'*p1(:,:,ricatti_iter+1)*B(:,ricatti_iter);
         %G-1x2
         G=B(:,ricatti_iter)'*p1(:,:,ricatti_iter+1)*A(:,:,ricatti_iter);
         %g-scalar
@@ -84,7 +85,7 @@ while max_iter<20
         %l-scalar
         l(ricatti_iter)=-inv(H)*g;
         %p1-2x2
-        p1(:,:,ricatti_iter)=modelParams.Qt+...
+        p1(:,:,ricatti_iter)=Q+...
             A(:,:,ricatti_iter)'*p1(:,:,ricatti_iter+1)*A(:,:,ricatti_iter)...
             +K(ricatti_iter,:)'*H*K(ricatti_iter,:)+...
             +K(ricatti_iter,:)'*G+ G'*K(ricatti_iter,:);
@@ -113,6 +114,9 @@ while max_iter<20
         J_actual=computeActualCost(act_traj,des_traj,modelParams);
         if J_actual<J_nom
             break
+        elseif ls_iter==modelParams.ls_steps & J_actual>=J_nom
+            act_traj.u=nom_traj.u;
+            break
         end
         alpha=alpha/modelParams.alpha_d;
     end
@@ -136,7 +140,7 @@ while max_iter<20
     if abs(last_l-norm(l))<1e-5
         break
     end
-    last_l=norm(l)
+    last_l=norm(l);
     max_iter=max_iter+1;
 end    
 figure(2);
