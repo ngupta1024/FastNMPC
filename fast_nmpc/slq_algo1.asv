@@ -52,7 +52,7 @@ end
 %repeat until max number of iterations or converged (l(t)<l_t)
 max_iter=1;
 while max_iter<20
-    t_start=tic;
+    t_start=tic();
     %simulate the trajectory forward
     nom_traj.x(:,1)=modelParams.x_init;
     for time_iter=1:modelParams.N-1
@@ -122,7 +122,7 @@ while max_iter<20
         act_traj.u(modelParams.N)=0;
         J_actual=computeActualCost(act_traj,des_traj,modelParams);
         if J_actual<J_nom
-            t_complete=toc(t_start)
+            t_final
             break
         elseif ls_iter==modelParams.ls_steps & J_actual>=J_nom
             act_traj.u=nom_traj.u;
@@ -143,10 +143,10 @@ while max_iter<20
         hold off;
         drawnow
     end
-    if abs(last_l-norm(l))<1e-5 | nom_traj.u==act_traj.u
+    nom_traj.u=act_traj.u;
+    if abs(last_l-norm(l))<1e-5
         break
     end
-    nom_traj.u=act_traj.u;
     last_l=norm(l);
     max_iter=max_iter+1;
 end    
