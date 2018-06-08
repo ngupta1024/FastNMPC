@@ -23,8 +23,7 @@ if nargin==0
     else
         load('nominal.mat','nom_traj');
         load('desired.mat','des_traj');
-        des_traj.x=repmat([3*pi/4;0.2],1,modelParams.N);
-        des_traj.u=zeros(size(des_traj.u));
+        des_traj.x=repmat(
     end
 else
     if modelParams.gen_traj
@@ -32,8 +31,6 @@ else
         save('desired.mat','des_traj');
     else
         load('desired.mat','des_traj');
-        des_traj.x=repmat(modelParams.goal,1,modelParams.N);
-        des_traj.u=zeros(size(des_traj.u));
         figure(2);
         plot(des_traj.x(1,:),des_traj.x(2,:),'b','LineWidth',2,'DisplayName','Desired');
         des_traj.x=des_traj.x(:,size(des_traj.x(1,:),2)-modelParams.N+1:end);

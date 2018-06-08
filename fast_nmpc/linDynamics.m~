@@ -1,6 +1,6 @@
 %% linearization of system dynamics at trajectory points
     %returns A 2x2xN B 2xN
-function [A,B]=linDynamics(modelParams,trajectory,dis_or_conti)
+function [A,B]=linDynamics(modelParams,trajectory)
 delta=0.01;
 % calculate A
 for traj_iter=1:1:size(trajectory.x(1,:),2)
@@ -21,15 +21,12 @@ for traj_iter=1:1:size(trajectory.x(1,:),2)
         (f_x2_plus-f_x2_min)/(2*delta)];
     
     %% Discretization- hack from wikipedia
-    if nargin>2
-        if dis_or_conti=='discrete'
-            M=[A(:,:,traj_iter) B(:,traj_iter);...
-                zeros(size(B(:,traj_iter),2),size(A,1)+size(B(:,traj_iter),2))]*modelParams.dt;
-            M=expm(M);
-            A(:,:,traj_iter)=M(1:size(A,1),1:size(A,2));
-            B(:,traj_iter)=M(1:size(A,1),end);
-        end
-    end
+    if dis_or_conti=
+    M=[A(:,:,traj_iter) B(:,traj_iter);...
+        zeros(size(B(:,traj_iter),2),size(A,1)+size(B(:,traj_iter),2))]*modelParams.dt;
+    M=expm(M);
+    A(:,:,traj_iter)=M(1:size(A,1),1:size(A,2));
+    B(:,traj_iter)=M(1:size(A,1),end);
     
 end
 end

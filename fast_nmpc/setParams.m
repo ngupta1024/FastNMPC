@@ -10,8 +10,8 @@ function modelParams=setParams()
     modelParams.T=10; %N=T/dt
     modelParams.N=modelParams.T/modelParams.dt+1;
     
-    modelParams.Qt=diag([10,10]);
-    modelParams.Qf=diag([100,100]);
+    modelParams.Qt=diag([100,100]);
+    modelParams.Qf=diag([10,10]);
     modelParams.Rt=1;
     
     modelParams.x_init=[0;0];
@@ -24,6 +24,8 @@ function modelParams=setParams()
     
 %% algo 2
 
-    modelParams.policy_lag=10;
-    
+    modelParams.policy_lag=0;
+    modelParams.Q_lqr=diag([10,10]);
+    modelParams.mpc_steps=10;
+    modelParams.goal=[pi;0];
 end
