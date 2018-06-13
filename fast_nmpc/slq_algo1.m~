@@ -176,7 +176,7 @@ while max_iter<100
         act_traj.x(:,1)=modelParams.x_init;
         for sim_iter=1:modelParams.N-1
             x_diff=act_traj.x(:,sim_iter)-nom_traj.x(:,sim_iter);
-%             x_diff(1)=wrapToPi(x_diff(1));
+            x_diff(1)=wrapToPi(x_diff(1));
             act_traj.u(sim_iter)= nom_traj.u(sim_iter)+alpha*l(sim_iter)+...
                 K(sim_iter,:)*(x_diff);
             if abs(act_traj.u(sim_iter))>modelParams.u_lim
@@ -236,7 +236,7 @@ if modelParams.viz
     figure('Name','states versus time');
     subplot(2,1,1);
     hold on;
-    plot([1:1:length(act_traj.x(1,:))],wrapToPi(act_traj.x(1,:)),'k','LineWidth',2);
+    plot([1:1:length(act_traj.x(1,:))],act_traj.x(1,:),'k','LineWidth',2);
     plot(modelParams.N, modelParams.goal(1),'r*');
     if modelParams.wp_bool
         for wp_iter=1:modelParams.num_wp
@@ -255,7 +255,7 @@ if modelParams.viz
             plot(wp{wp_iter}.t_p*modelParams.T,wp{wp_iter}.state(2),'g*');
         end
     end
-    legend('velocity','desired','waypoints');
+    legend('velocity','desired''waypoints');
     title('velocity versus time');
     hold off;
     
