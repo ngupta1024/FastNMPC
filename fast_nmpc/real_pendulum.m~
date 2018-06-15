@@ -1,0 +1,4 @@
+function real_pendulum()
+% changing dynamics 
+modelParams.m=modelParams.m+0.2;
+end

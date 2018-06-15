@@ -1,14 +1,19 @@
-function [act_traj]=slq_algo1(nom_traj,modelParams)
+function [act_traj,u_ff, u_fb]=slq_algo1(nom_traj,modelParams, u_ff_prev, u_fb_prev)
 %% writing a good code
 % all functions, structs and classes- Camel case
 % all variables-underscore
+
 close all
-clc
+set(0,'DefaultFigureWindowStyle','docked');
 %% main
 if nargin==0
     modelParams=setParams();
+else
+    u_ff=u_ff_prev;
+    u_fb=u_fb_prev;
 end
 converged=0;
+
 %% handles for dynamics
 simple_pend=@(x,u)simplePendDynamics(x,u, modelParams);
 aug_pend=@(x,u)augPendDynamics(x,u, modelParams);
@@ -44,13 +49,6 @@ else % MPC stuff
         end
     else
         load('desired.mat','des_traj');
-    end
-    
-    figure(2);
-    if modelParams.traj_track
-        plot(des_traj.x(1,:),des_traj.x(2,:),'b','LineWidth',2,'DisplayName','Desired');
-    else
-        plot(modelParams.goal(1), modelParams.goal(2),'r*');
     end
 
     % concatenating desired traj vector as per time horizon (MPC)
@@ -124,8 +122,9 @@ while max_iter<100
     
     %compute cost function
     J_nom=computeActualCost(nom_traj,des_traj,modelParams);
-    fprintf('At Iteration %d, cost= %f \n',max_iter,J_nom);
-    
+    if modelParams.printf
+        fprintf('At Iteration %d, cost= %f \n',max_iter,J_nom);
+    end
     % Quadratize cost function along the trajectory
     x_diff=nom_traj.x-des_traj.x;
     x_diff(1,:)=wrapToPi(x_diff(1,:));
@@ -176,7 +175,7 @@ while max_iter<100
         act_traj.x(:,1)=modelParams.x_init;
         for sim_iter=1:modelParams.N-1
             x_diff=act_traj.x(:,sim_iter)-nom_traj.x(:,sim_iter);
-%             x_diff(1)=wrapToPi(x_diff(1));
+            % I think here wrapToPi should not be done
             act_traj.u(sim_iter)= nom_traj.u(sim_iter)+alpha*l(sim_iter)+...
                 K(sim_iter,:)*(x_diff);
             if abs(act_traj.u(sim_iter))>modelParams.u_lim
@@ -189,7 +188,11 @@ while max_iter<100
         J_actual=computeActualCost(act_traj,des_traj,modelParams);
         if J_actual<J_nom
             t_complete=toc(t_start);
-            fprintf("the time taken by this iteration = %f \n",t_complete);
+            if modelParams.printf
+                fprintf("the time taken by this iteration = %f \n",t_complete);
+            end
+            u_ff=alpha*l;
+            u_fb=K;
             break
         elseif ls_iter==modelParams.ls_steps && J_actual>=J_nom
             act_traj.u=nom_traj.u;

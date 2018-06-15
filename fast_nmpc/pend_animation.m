@@ -1,5 +1,5 @@
 function pend_animation(x,fig_pend)
-figure(3);
+fig_pend;
 hold on;
 modelParams=setParams();
 O=[0 0];
